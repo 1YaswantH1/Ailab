@@ -1,0 +1,238 @@
+GREEDY KNAPSACK
+
+class Item:
+    def __init__(self, value, weight):
+        self.value = value
+        self.weight = weight
+        self.ratio = value / weight
+
+def fractional_knapsack(items, capacity):
+    # Step 1: Sort items by value-to-weight ratio in descending order
+    items.sort(key=lambda item: item.ratio, reverse=True)
+
+    total_value = 0.0  # Total value in the knapsack
+    current_weight = 0  # Current weight in the knapsack
+
+    # Step 2: Loop through sorted items and add to knapsack
+    for item in items:
+        if current_weight + item.weight <= capacity:
+            # If item fits fully, add it
+            current_weight += item.weight
+            total_value += item.value
+        else:
+            # If item does not fit fully, take a fraction of it
+            remain_weight = capacity - current_weight
+            fraction = remain_weight / item.weight
+            total_value += item.value * fraction
+            break  # Knapsack is now full
+
+    return total_value
+
+# Example usage
+items = [
+    Item(60, 10),  # value = 60, weight = 10
+    Item(100, 20), # value = 100, weight = 20
+    Item(120, 30)  # value = 120, weight = 30
+]
+capacity = 50
+
+max_value = fractional_knapsack(items, capacity)
+print("Maximum value in knapsack =", max_value)
+
+
+2) QUICK SORT
+     
+# Quick Sort implementation using Divide and Conquer
+
+def quick_sort(arr):
+    # Base case: if the array is empty or has only one element, it's already sorted
+    if len(arr) <= 1:
+        return arr
+    else:
+        # Step 1: Choose a pivot
+        pivot = arr[0]
+        
+        # Step 2: Partition the array into three parts:
+        # Elements less than the pivot, elements equal to the pivot, and elements greater than the pivot
+        less_than_pivot = [x for x in arr[1:] if x < pivot]
+        equal_to_pivot = [x for x in arr if x == pivot]
+        greater_than_pivot = [x for x in arr[1:] if x > pivot]
+        
+        # Step 3: Recursively sort the partitions and combine them
+        return quick_sort(less_than_pivot) + equal_to_pivot + quick_sort(greater_than_pivot)
+
+# Testing the function
+arr = [34, 7, 23, 32, 5, 62]
+sorted_arr = quick_sort(arr)
+print("Sorted array:", sorted_arr)
+
+
+3) MERGE SORT
+  
+# Merge Sort implementation using Divide and Conquer
+
+def merge_sort(arr):
+    # Base case: If the array has one or zero elements, it's already sorted
+    if len(arr) <= 1:
+        return arr
+
+    # Step 1: Split the array into two halves
+    mid = len(arr) // 2
+    left_half = arr[:mid]
+    right_half = arr[mid:]
+
+    # Step 2: Recursively sort each half
+    left_sorted = merge_sort(left_half)
+    right_sorted = merge_sort(right_half)
+
+    # Step 3: Merge the sorted halves
+    return merge(left_sorted, right_sorted)
+
+def merge(left, right):
+    # Merging two sorted arrays
+    sorted_arr = []
+    i = j = 0
+
+    # Step 4: Compare elements from each half and merge them in sorted order
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            sorted_arr.append(left[i])
+            i += 1
+        else:
+            sorted_arr.append(right[j])
+            j += 1
+
+    # Step 5: Append remaining elements, if any
+    sorted_arr.extend(left[i:])
+    sorted_arr.extend(right[j:])
+
+    return sorted_arr
+
+# Testing the function
+arr = [34, 7, 23, 32, 5, 62]
+sorted_arr = merge_sort(arr)
+print("Sorted array:", sorted_arr)
+4) MIN HEAP MAX HEAP
+5)  HEAP SORT 
+  
+def heapify(arr, n, i):
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+
+    if left < n and arr[left] > arr[largest]:
+        largest = left
+
+    if right < n and arr[right] > arr[largest]:
+        largest = right
+
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        heapify(arr, n, largest)
+
+def heap_sort(arr):
+    n = len(arr)
+
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+
+    for i in range(n - 1, 0, -1):
+        arr[i], arr[0] = arr[0], arr[i]
+        heapify(arr, i, 0)
+
+arr = [12, 11, 13, 5, 6, 7]
+print("Original array:", arr)
+
+heap_sort(arr)
+print("Sorted array:", arr) 
+
+
+6) HASHING
+
+class HashTable:
+    def __init__(self, size):
+        self.size = size
+        self.table = [[] for _ in range(size)]
+
+    def hash_function(self, key):
+        return key % self.size
+
+    def insert_separate_chaining(self, key):
+        index = self.hash_function(key)
+        self.table[index].append(key)
+
+    def insert_linear_probing(self, key):
+        index = self.hash_function(key)
+        start_index = index
+        while self.table[index] != []:
+            index = (index + 1) % self.size
+            if index == start_index:
+                print("Hash table is full!")
+                return
+        self.table[index] = key
+
+    def insert_quadratic_probing(self, key):
+        index = self.hash_function(key)
+        i = 1
+        start_index = index
+        while self.table[index] != []:
+            index = (start_index + i**2) % self.size
+            i += 1
+            if i == self.size:
+                print("Hash table is full!")
+                return
+        self.table[index] = key
+
+    def double_hash_function(self, key):
+        return 7 - (key % 7)
+
+    def insert_double_hashing(self, key):
+        index = self.hash_function(key)
+        step_size = self.double_hash_function(key)
+        start_index = index
+        while self.table[index] != []:
+            index = (index + step_size) % self.size
+            if index == start_index:
+                print("Hash table is full!")
+                return
+        self.table[index] = key
+
+    def display(self):
+        for i in range(self.size):
+            print(f"Index {i}: {self.table[i]}")
+
+def main():
+    size = int(input("Enter the size of the hash table: "))
+    hash_table = HashTable(size)
+
+    print("\nChoose the collision resolution technique:")
+    print("1. Separate Chaining")
+    print("2. Linear Probing")
+    print("3. Quadratic Probing")
+    print("4. Double Hashing")
+    
+    choice = int(input("Enter your choice (1/2/3/4): "))
+    
+    if choice not in [1, 2, 3, 4]:
+        print("Invalid choice!")
+        return
+
+    while True:
+        value = int(input("\nEnter a value to insert (or -1 to stop): "))
+        if value == -1:
+            break
+        if choice == 1:
+            hash_table.insert_separate_chaining(value)
+        elif choice == 2:
+            hash_table.insert_linear_probing(value)
+        elif choice == 3:
+            hash_table.insert_quadratic_probing(value)
+        elif choice == 4:
+            hash_table.insert_double_hashing(value)
+
+    print("\nHash Table:")
+    hash_table.display()
+
+if __name__ == "__main__":
+    main()
+
