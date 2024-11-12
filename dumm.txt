@@ -1,0 +1,196 @@
+# 1) Fractional Knapsack Problem (Greedy Algorithm)
+
+class Item:
+    def __init__(self, value, weight):
+        self.value = value
+        self.weight = weight
+        self.ratio = value / weight
+
+def fractional_knapsack(items, capacity):
+    items.sort(key=lambda x: x.ratio, reverse=True)
+    total_value = 0.0
+    for item in items:
+        if capacity - item.weight >= 0:
+            capacity -= item.weight
+            total_value += item.value
+        else:
+            fraction = capacity / item.weight
+            total_value += item.value * fraction
+            break
+    return total_value
+
+items = eval(input("Enter items as list of tuples (value, weight): "))  # e.g., [(60, 10), (100, 20), (120, 30)]
+capacity = int(input("Enter knapsack capacity: "))  # e.g., 50
+item_objects = [Item(value, weight) for value, weight in items]
+max_value = fractional_knapsack(item_objects, capacity)
+print("Maximum value in knapsack =", max_value)
+# 2) QuickSort (Divide and Conquer)
+
+# python
+# Copy code
+def quick_sort(arr, pivot_index):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[pivot_index]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quick_sort(left, len(left) // 2) + middle + quick_sort(right, len(right) // 2)
+
+arr = eval(input("Enter the list of numbers to sort: "))  # e.g., [33, 10, 55, 21, 19, 45, 70]
+pivot_index = int(input(f"Enter pivot index (0 to {len(arr) - 1}): "))
+sorted_arr = quick_sort(arr, pivot_index)
+print("Sorted array:", sorted_arr)
+# 3) Merge Sort (Divide and Conquer)
+
+# python
+# Copy code
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left_half = merge_sort(arr[:mid])
+    right_half = merge_sort(arr[mid:])
+    return merge(left_half, right_half)
+
+def merge(left, right):
+    sorted_arr = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            sorted_arr.append(left[i])
+            i += 1
+        else:
+            sorted_arr.append(right[j])
+            j += 1
+    sorted_arr.extend(left[i:])
+    sorted_arr.extend(right[j:])
+    return sorted_arr
+
+arr = eval(input("Enter the list of numbers to sort: "))  # e.g., [33, 10, 55, 21, 19, 45, 70]
+sorted_arr = merge_sort(arr)
+print("Sorted array:", sorted_arr)
+# 4) Min-Heap Implementation
+
+# python
+# Copy code
+class MinHeap:
+    def __init__(self):
+        self.heap = []
+
+    def insert(self, element):
+        self.heap.append(element)
+        self._heapify_up(len(self.heap) - 1)
+
+    def delete_min(self):
+        if len(self.heap) == 0:
+            return None
+        if len(self.heap) == 1:
+            return self.heap.pop()
+        min_element = self.heap[0]
+        self.heap[0] = self.heap.pop()
+        self._heapify_down(0)
+        return min_element
+
+    def _heapify_up(self, index):
+        parent = (index - 1) // 2
+        if index > 0 and self.heap[index] < self.heap[parent]:
+            self.heap[index], self.heap[parent] = self.heap[parent], self.heap[index]
+            self._heapify_up(parent)
+
+    def _heapify_down(self, index):
+        smallest = index
+        left = 2 * index + 1
+        right = 2 * index + 2
+        if left < len(self.heap) and self.heap[left] < self.heap[smallest]:
+            smallest = left
+        if right < len(self.heap) and self.heap[right] < self.heap[smallest]:
+            smallest = right
+        if smallest != index:
+            self.heap[index], self.heap[smallest] = self.heap[smallest], self.heap[index]
+            self._heapify_down(smallest)
+
+min_heap = MinHeap()
+min_heap.insert(10)
+min_heap.insert(5)
+min_heap.insert(20)
+min_heap.insert(3)
+print("Heap before deletion =", min_heap.heap)
+print("Min element =", min_heap.delete_min())
+print("Heap after deletion =", min_heap.heap)
+# 5) Heap Sort
+
+# python
+# Copy code
+def heapify(arr, n, i):
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+    if left < n and arr[left] > arr[largest]:
+        largest = left
+    if right < n and arr[right] > arr[largest]:
+        largest = right
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        heapify(arr, n, largest)
+
+def heap_sort(arr):
+    n = len(arr)
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+    for i in range(n - 1, 0, -1):
+        arr[i], arr[0] = arr[0], arr[i]
+        heapify(arr, i, 0)
+
+arr = eval(input("Enter the list of numbers to sort: "))  # e.g., [33, 10, 55, 21, 19, 45, 70]
+heap_sort(arr)
+print("Sorted array =", arr)
+# 6) Hash Table with Collision Resolution Techniques
+
+# python
+# Copy code
+class HashTable:
+    def __init__(self, size=10):
+        self.size = size
+        self.table = [None] * size
+
+    def hash_function(self, key):
+        return key % self.size
+
+    def insert(self, key, value, method):
+        index = self.hash_function(key)
+        if method == 'separate_chaining':
+            self._separate_chaining_insert(key, value, index)
+        elif method == 'linear_probing':
+            self._linear_probing_insert(key, value, index)
+        elif method == 'quadratic_probing':
+            self._quadratic_probing_insert(key, value, index)
+        elif method == 'double_hashing':
+            self._double_hashing_insert(key, value, index)
+
+    def search(self, key, method):
+        index = self.hash_function(key)
+        if method == 'separate_chaining':
+            return self._separate_chaining_search(key, index)
+        elif method == 'linear_probing':
+            return self._linear_probing_search(key, index)
+        elif method == 'quadratic_probing':
+            return self._quadratic_probing_search(key, index)
+        elif method == 'double_hashing':
+            return self._double_hashing_search(key, index)
+
+    def display(self):
+        for i in range(self.size):
+            print(f"Index {i}: {self.table[i]}")
+
+    # Collision resolution methods...
+    # Add methods for `_separate_chaining_insert`, `_linear_probing_insert`, `_quadratic_probing_insert`, `_double_hashing_insert`, `_separate_chaining_search`, `_linear_probing_search`, `_quadratic_probing_search`, `_double_hashing_search` here
+
+ht = HashTable()
+method = input("Enter method: ")
+ht.insert(10, 'a', method)
+ht.insert(20, 'b', method)
+ht.insert(30, 'c', method)
+ht.display()
+key = int(input("Enter key to search: "))
+print("Search result:", ht.search(key, method))
