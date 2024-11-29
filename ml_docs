@@ -275,27 +275,22 @@ ggplot(data = test_data, aes(x = salary, y = predicted_salary)) +
 
 
 #LIME ON NUMERICAL DATA
-data(iris)
-iris$Class<-as.numeric(iris$Species=="setosa")
-intrain<-createDataPartition(iris$Species,p=0.75,list=FALSE)
-train<-iris[intrain,]
-test<-iris[-intrain,]
-train_matrix<-as.matrix(train[,1:4])
-test_matrix<-as.matrix((test[,1:4]))
-train_labels<-train$Class
-test_labels<-test$Class
-library(xgboost)
-model<-xgboost(data=train_matrix,label = train_labels, objective="binary:logistic",nrounds=50,verbose=0)
-summary(model)
-prediction<-predict(model,newdata=test_matrix)
-predictionclass<-ifelse(prediction>0.5,1,0)
-confusionMatrix(factor(predictionclass),factor(test_labels))
-explanation<-lime(train[,1:4],model,bin_continuous=TRUE,n_bins=5)
 library(lime)
-example<-test[5,1:4,drop=FALSE]
-actual_class<-test$Class[5]
-expl<-explain(example,explanation,n_labels = 1, n_features=4,kernal_width=0.5)
-plot_features(expl)
+library(randomForest)
+library(ggplot2)
+# Load data
+data(iris)
+# Train a random forest model
+model <- randomForest(Species ~ ., data = iris)
+# Create a LIME explainer
+explainer <- lime(iris[, -5], model)
+# Select a specific instance to explain
+instance <- iris[1, -5]
+# Explain the instance
+explanation <- explain(instance, explainer, n_features = 2)
+# Visualize importance
+plot_features(explanation)
+
 
 
 
